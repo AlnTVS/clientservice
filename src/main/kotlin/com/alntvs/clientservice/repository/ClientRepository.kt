@@ -6,4 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ClientRepository: JpaRepository<ClientEntity,Long>, JpaSpecificationExecutor<ClientEntity>
+interface ClientRepository : JpaRepository<ClientEntity, Long>, JpaSpecificationExecutor<ClientEntity> {
+    fun findByUserName(username: String): ClientEntity?
+//    fun findByIdOrElseNull(id: Long): ClientEntity?
+}

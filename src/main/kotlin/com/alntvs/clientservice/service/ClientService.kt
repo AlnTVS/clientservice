@@ -11,7 +11,11 @@ import javax.persistence.EntityNotFoundException
 class ClientService(private val clientRepository: ClientRepository, private val mapper: ClientMapper) {
 
     fun create(clientDTO: ClientDTO) {
-        clientRepository.save(mapper.clientDTOToEntity(clientDTO))
+        clientDTO.userName?.also {
+            clientRepository.findByUserName(it)?.also {
+                throw IllegalArgumentException("Client with username:${clientDTO.userName} already exists!")
+            } ?: clientRepository.save(mapper.clientDTOToEntity(clientDTO))
+        } ?: throw IllegalArgumentException("Field 'userName' must be filled!")
     }
 
     fun getAll() = mapper.clientEntityToDTOasList(clientRepository.findAll())
