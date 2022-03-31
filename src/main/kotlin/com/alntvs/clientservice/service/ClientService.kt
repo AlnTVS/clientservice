@@ -35,4 +35,10 @@ class ClientService(private val clientRepository: ClientRepository, private val 
             } ?: throw IllegalArgumentException("Client with id:${clientDTO.id} doesn't exists!")
         } ?: throw IllegalArgumentException("Field 'id' and 'userName' must be filled!")
     }
+
+    fun delete(id: Long) {
+            clientRepository.findByIdOrNull(id)?.also {
+                clientRepository.deleteById(id)
+            } ?: throw IllegalArgumentException("Client with id:$id doesn't exists!")
+    }
 }

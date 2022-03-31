@@ -18,10 +18,13 @@ class ClientController(val clientService: ClientService) {
     fun getAll(): List<ClientDTO> = clientService.getAll()
 
     @GetMapping("/{id}")
-    fun getById(@PathVariable id: Long): ClientDTO = clientService.getById(id)
+    fun getById(@PathVariable id: Long) = clientService.getById(id)
 
     @PostMapping("/update")
     fun update(@RequestBody clientDTO: ClientDTO) {
         clientService.update(clientDTO)
     }
+
+    @GetMapping("/delete/{id}")
+    fun delete(@PathVariable id: Long) = clientService.delete(id)
 }
