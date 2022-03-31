@@ -1,0 +1,22 @@
+package com.alntvs.clientservice.controller
+
+import com.alntvs.clientservice.model.ClientDTO
+import com.alntvs.clientservice.service.ClientService
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import org.springframework.web.bind.annotation.*
+
+@RestController
+@RequestMapping(value = ["/user"], produces = [APPLICATION_JSON_VALUE])
+class ClientController(val clientService: ClientService) {
+
+    @PostMapping("/create")
+    fun create(@RequestBody clientDTO: ClientDTO) {
+        clientService.create(clientDTO)
+    }
+
+    @GetMapping("/all")
+    fun getAll(): List<ClientDTO> = clientService.getAll()
+
+    @GetMapping("/{id}")
+    fun getById(@PathVariable id: Long): ClientDTO = clientService.getById(id)
+}
