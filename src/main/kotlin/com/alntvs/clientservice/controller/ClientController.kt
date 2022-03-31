@@ -19,4 +19,9 @@ class ClientController(val clientService: ClientService) {
 
     @GetMapping("/{id}")
     fun getById(@PathVariable id: Long): ClientDTO = clientService.getById(id)
+
+    @PostMapping("/update")
+    fun update(@RequestBody clientDTO: ClientDTO) {
+        clientService.update(clientDTO)
+    }
 }
