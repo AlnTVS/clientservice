@@ -4,8 +4,6 @@ import java.io.Serializable
 
 enum class Operation {
     CREATE,
-    READ_BY_ID,
-    READ_ALL,
     UPDATE,
     DELETE;
 }
