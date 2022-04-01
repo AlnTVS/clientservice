@@ -1,9 +1,11 @@
 package com.alntvs.clientservice.service
 
+import com.alntvs.clientservice.exception.ClientServiceException
 import com.alntvs.clientservice.mapper.ClientMapper
 import com.alntvs.clientservice.model.ClientDTO
 import com.alntvs.clientservice.repository.ClientRepository
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
 import org.springframework.stereotype.Service
 import javax.persistence.EntityNotFoundException
 
@@ -21,11 +23,14 @@ class ClientService(private val clientRepository: ClientRepository, private val 
     fun getAll() = mapper.clientEntityToDTOasList(clientRepository.findAll())
 
     fun getById(id: Long): ClientDTO {
-        try {
-            return mapper.clientEntityToDTO(clientRepository.getById(id))
-        } catch (e: EntityNotFoundException) {
-            throw EntityNotFoundException("User with id = $id not exists")
-        }
+        return mapper.clientEntityToDTO(
+            try {
+                clientRepository.getById(id)
+            }
+            catch (e: JpaObjectRetrievalFailureException) {
+                throw ClientServiceException("User with id = $id doesn't exists")
+            }
+        )
     }
 
     fun update(clientDTO: ClientDTO) {
@@ -37,8 +42,8 @@ class ClientService(private val clientRepository: ClientRepository, private val 
     }
 
     fun delete(id: Long) {
-            clientRepository.findByIdOrNull(id)?.also {
-                clientRepository.deleteById(id)
-            } ?: throw IllegalArgumentException("Client with id:$id doesn't exists!")
+        clientRepository.findByIdOrNull(id)?.also {
+            clientRepository.deleteById(id)
+        } ?: throw IllegalArgumentException("Client with id:$id doesn't exists!")
     }
 }
