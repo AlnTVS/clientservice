@@ -9,7 +9,6 @@ class KafkaProducerService(private val kafkaTemplate: KafkaTemplate<String, Resp
 
     fun sendResponse(msg: ResponseDTO) {
         kafkaTemplate.send("service_client_topic", msg)
-        return
     }
 
 }
