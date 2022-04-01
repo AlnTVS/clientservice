@@ -1,5 +1,7 @@
 package com.alntvs.clientservice.model
 
+import java.io.Serializable
+
 data class ClientDTO(
     var id: Long? = null,
     var userName: String? = null,
@@ -9,4 +11,4 @@ data class ClientDTO(
     var mobilePhone: String? = null,
     var address: String? = null,
     var isActive: Boolean? = null
-)
+): Serializable

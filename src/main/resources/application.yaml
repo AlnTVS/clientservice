@@ -12,7 +12,22 @@ spring:
         temp:
           use_jdbc_metadata_defaults: false
   liquibase:
-    change-log: classpath:/db/changelog/changelog.xml
+    change-log: classpath:db/changelog/changelog.xml
+    enabled: true
   h2:
     console:
       enabled: true
+  kafka:
+    bootstrap-servers: localhost:29092
+    consumer:
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: com.alntvs.*
+          deserializer:
+            value:
+              delegate:
+                class: org.springframework.kafka.support.serializer.JsonDeserializer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer

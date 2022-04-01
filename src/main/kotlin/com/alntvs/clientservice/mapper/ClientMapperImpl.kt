@@ -2,7 +2,6 @@ package com.alntvs.clientservice.mapper
 
 import com.alntvs.clientservice.entity.ClientEntity
 import com.alntvs.clientservice.model.ClientDTO
-import org.mapstruct.Mapper
 import org.springframework.stereotype.Component
 
 @Component
