@@ -4,17 +4,21 @@ import com.alntvs.clientservice.exception.ClientServiceException
 import com.alntvs.clientservice.model.Operation.*
 import com.alntvs.clientservice.model.OperationDTO
 import com.alntvs.clientservice.model.ResponseDTO
+import com.alntvs.clientservice.util.EnvProp
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 
 @Service
 class KafkaConsumerService(
     private val clientService: ClientService,
-    private val kafkaProducerService: KafkaProducerService
+    private val kafkaProducerService: KafkaProducerService,
+    val envProp: EnvProp
 ) {
 
-    @KafkaListener(id = "ClientService", topics = ["client_service_topic"])
+    @KafkaListener(id = "#{__listener.envProp.consumerId}", topics = ["#{__listener.envProp.consumerTopic}"])
     fun webConsumer(msg: OperationDTO) {
+
         val op = msg.operation
         try {
             msg.clientDTO
