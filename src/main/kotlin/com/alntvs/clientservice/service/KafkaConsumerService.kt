@@ -1,11 +1,10 @@
 package com.alntvs.clientservice.service
 
-import com.alntvs.clientservice.exception.ClientServiceException
+import com.alntvs.clientservice.model.ClientDTO
 import com.alntvs.clientservice.model.Operation.*
 import com.alntvs.clientservice.model.OperationDTO
 import com.alntvs.clientservice.model.ResponseDTO
 import com.alntvs.clientservice.util.EnvProp
-import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 
@@ -18,22 +17,25 @@ class KafkaConsumerService(
 
     @KafkaListener(id = "#{__listener.envProp.consumerId}", topics = ["#{__listener.envProp.consumerTopic}"])
     fun webConsumer(msg: OperationDTO) {
-
-        val op = msg.operation
-        try {
-            msg.clientDTO
-                ?: throw ClientServiceException("Received null clientDTO from Kafka for $op operation")
-            when (msg.operation) {
-                CREATE -> clientService.create(msg.clientDTO)
-                UPDATE -> clientService.update(msg.clientDTO)
-                DELETE -> clientService.delete(
-                    msg.clientDTO.id ?: throw ClientServiceException("Received null id in clientDTO from Kafka for $op operation")
-                )
-                else -> throw ClientServiceException("No found operation")
-            }
-        } catch (e: ClientServiceException) {
-            kafkaProducerService.sendResponse(ResponseDTO(e.message))
+        var failed = false
+        val answerError = { response: String ->
+            failed = true
+            kafkaProducerService.sendResponse(ResponseDTO(response))
         }
-        kafkaProducerService.sendResponse(ResponseDTO("OK"))
+        val operation = msg.operation ?: answerError("Received operation is null!")
+        val ifNullAnswerError = { any: Any?, paramName: String ->
+            any ?: answerError("Parameter '$paramName' must not be null! Operation: '$operation'.")
+        }
+        try {
+            when (msg.operation) {
+                UPDATE -> clientService.update(ifNullAnswerError(msg.clientDTO, "clientDTO") as ClientDTO)
+                CREATE -> clientService.create(ifNullAnswerError(msg.clientDTO, "clientDTO") as ClientDTO)
+                DELETE -> clientService.delete(ifNullAnswerError(msg.clientDTO?.id, "id") as Long)
+            }
+        } catch (e: RuntimeException) {
+            answerError(e.message?:"Unknown error")
+        }
+        if(!failed) kafkaProducerService.sendResponse(ResponseDTO("OK"))
     }
+
 }
