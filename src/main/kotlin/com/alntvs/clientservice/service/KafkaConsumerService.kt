@@ -15,7 +15,7 @@ class KafkaConsumerService(
     val envProp: EnvProp
 ) {
 
-    @KafkaListener(id = "#{__listener.envProp.consumerId}", topics = ["#{__listener.envProp.consumerTopic}"])
+    @KafkaListener(id = "\${spring.kafka.consumer.id}", topics = ["\${spring.kafka.consumer.topic}"])
     fun webConsumer(msg: OperationDTO) {
         var failed = false
         val answerError = { response: String ->
@@ -37,5 +37,4 @@ class KafkaConsumerService(
         }
         if(!failed) kafkaProducerService.sendResponse(ResponseDTO("OK"))
     }
-
 }

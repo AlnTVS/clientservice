@@ -20,9 +20,12 @@ spring:
   kafka:
     bootstrap-servers: localhost:29092
     producer:
+      topic: service_client_topic
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
+      id: ClientService
+      topic: client_service_topic
       properties:
         spring:
           json:
