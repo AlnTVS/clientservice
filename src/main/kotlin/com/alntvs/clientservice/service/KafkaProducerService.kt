@@ -12,8 +12,12 @@ class KafkaProducerService(
     val topic: String
 ) {
 
+    init {
+        kafkaTemplate.defaultTopic = topic
+    }
+
     fun sendResponse(msg: ResponseDTO) {
-        kafkaTemplate.send(topic, msg)
+        kafkaTemplate.sendDefault(msg)
     }
 
 }
