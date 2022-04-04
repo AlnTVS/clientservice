@@ -1,15 +1,19 @@
 package com.alntvs.clientservice.service
 
 import com.alntvs.clientservice.model.ResponseDTO
-import com.alntvs.clientservice.util.EnvProp
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 
 @Service
-class KafkaProducerService(private val kafkaTemplate: KafkaTemplate<String, ResponseDTO>, private val envProp: EnvProp) {
+class KafkaProducerService(
+    private val kafkaTemplate: KafkaTemplate<String, ResponseDTO>,
+    @Value("\${spring.kafka.producer.topic}")
+    val topic: String
+) {
 
     fun sendResponse(msg: ResponseDTO) {
-        kafkaTemplate.send(envProp.producerTopic, msg)
+        kafkaTemplate.send(topic, msg)
     }
 
 }
