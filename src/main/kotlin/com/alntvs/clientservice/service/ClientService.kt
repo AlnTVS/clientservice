@@ -36,7 +36,13 @@ class ClientService(
 
     fun update(clientDTO: ClientDTO) {
         clientDTO.id?.also {
-            clientRepository.findByIdOrNull(it)?.also {
+            clientRepository.findByIdOrNull(it)?.also { clientById ->
+                val userName: String = clientDTO.userName ?: clientById.userName!!
+                clientRepository.findByUserName(userName)?.also { clientByUserName ->
+                    if (clientById.id != clientByUserName.id) {
+                        throw IllegalArgumentException("Client with username:${clientDTO.userName} already exists!")
+                    }
+                }
                 clientRepository.save(mapper.clientDTOToEntity(clientDTO))
             } ?: throw IllegalArgumentException("Client with id:${clientDTO.id} doesn't exists!")
         } ?: throw IllegalArgumentException("Field 'id' and 'userName' must be filled!")
