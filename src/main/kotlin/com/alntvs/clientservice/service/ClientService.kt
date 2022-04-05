@@ -7,10 +7,12 @@ import com.alntvs.clientservice.repository.ClientRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
 import org.springframework.stereotype.Service
-import javax.persistence.EntityNotFoundException
 
 @Service
-class ClientService(private val clientRepository: ClientRepository, private val mapper: ClientMapper) {
+class ClientService(
+    private val clientRepository: ClientRepository,
+    private val mapper: ClientMapper
+) {
 
     fun create(clientDTO: ClientDTO) {
         clientDTO.userName?.also {
@@ -26,8 +28,7 @@ class ClientService(private val clientRepository: ClientRepository, private val 
         return mapper.clientEntityToDTO(
             try {
                 clientRepository.getById(id)
-            }
-            catch (e: JpaObjectRetrievalFailureException) {
+            } catch (e: JpaObjectRetrievalFailureException) {
                 throw ClientServiceException("User with id = $id doesn't exists")
             }
         )
