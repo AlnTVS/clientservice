@@ -1,6 +1,7 @@
 package com.alntvs.clientservice.service
 
 import com.alntvs.clientservice.entity.ClientEntity
+import com.alntvs.clientservice.exception.ClientServiceException
 import com.alntvs.clientservice.mapper.ClientMapper
 import com.alntvs.clientservice.model.ClientDTO
 import com.alntvs.clientservice.repository.ClientRepository
@@ -9,6 +10,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
+import javax.persistence.EntityNotFoundException
 
 internal class ClientServiceTest {
 
@@ -79,7 +82,32 @@ internal class ClientServiceTest {
     }
 
     @Test
-    fun getById() {
+    fun `getById for exist user`() {
+        val id: Long = 1
+        val userName = "user1"
+        val clientEntity = ClientEntity(id = id, userName = userName)
+        val clientDTO = ClientDTO(id = id, userName = userName)
+
+        every { clientRepository.getById(id) } returns clientEntity
+        every { mapper.clientEntityToDTO(clientEntity) } returns clientDTO
+
+        val result = clientService.getById(id)
+
+        assert(result == clientDTO)
+    }
+
+    @Test
+    fun `getById for not exist user`() {
+        val id: Long = 1
+        val msg = "User with id = $id doesn't exists"
+
+        every { clientRepository.getById(id) } throws JpaObjectRetrievalFailureException(EntityNotFoundException())
+
+        val exception = assertThrows<ClientServiceException> {
+            clientService.getById(id)
+        }
+
+        assert(exception.message == msg)
     }
 
     @Test
