@@ -4,15 +4,13 @@ import com.alntvs.clientservice.model.ClientDTO
 import com.alntvs.clientservice.model.Operation.*
 import com.alntvs.clientservice.model.OperationDTO
 import com.alntvs.clientservice.model.ResponseDTO
-import com.alntvs.clientservice.util.EnvProp
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 
 @Service
 class KafkaConsumerService(
     private val clientService: ClientService,
-    private val kafkaProducerService: KafkaProducerService,
-    val envProp: EnvProp
+    private val kafkaProducerService: KafkaProducerService
 ) {
 
     @KafkaListener(id = "\${spring.kafka.consumer.id}", topics = ["\${spring.kafka.consumer.topic}"])
