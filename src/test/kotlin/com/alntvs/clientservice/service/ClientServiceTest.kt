@@ -10,11 +10,15 @@ import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
 import javax.persistence.EntityNotFoundException
+
 
 internal class ClientServiceTest {
 
@@ -50,7 +54,8 @@ internal class ClientServiceTest {
         val exception = assertThrows<IllegalArgumentException> {
             clientService.create(clientDTO)
         }
-        assert(msg == exception.message)
+
+        assertEquals(msg, exception.message)
     }
 
     @Test
@@ -63,7 +68,7 @@ internal class ClientServiceTest {
             clientService.create(clientDTO)
         }
 
-        assert(msg == exception.message)
+        assertEquals(msg, exception.message)
     }
 
     @Test
@@ -81,7 +86,7 @@ internal class ClientServiceTest {
         val result = clientService.getAll()
 
         verify { clientRepository.findAll() }
-        assert(result == clientDTOList)
+        assertEquals(result, clientDTOList)
     }
 
     @Test
@@ -96,7 +101,7 @@ internal class ClientServiceTest {
 
         val result = clientService.getById(id)
 
-        assert(result == clientDTO)
+        assertEquals(result, clientDTO)
     }
 
     @Test
@@ -110,7 +115,7 @@ internal class ClientServiceTest {
             clientService.getById(id)
         }
 
-        assert(exception.message == msg)
+        assertEquals(exception.message, msg)
     }
 
     @Test
@@ -151,7 +156,7 @@ internal class ClientServiceTest {
             clientService.update(clientDTO)
         }
 
-        assert(result.message == msg)
+        assertEquals(result.message, msg)
     }
 
     @Test
@@ -172,7 +177,7 @@ internal class ClientServiceTest {
             clientService.update(clientDTO)
         }
 
-        assert(result.message == msg)
+        assertEquals(result.message, msg)
     }
 
     @Test
@@ -192,7 +197,7 @@ internal class ClientServiceTest {
             clientService.update(clientDTO)
         }
 
-        assert(exception.message?.contains(msg) ?: false)
+        assertThat(exception.message, containsString(msg))
     }
 
     @Test
@@ -239,6 +244,6 @@ internal class ClientServiceTest {
             clientService.delete(id)
         }
 
-        assert(exception.message == msg)
+        assertEquals(exception.message, msg)
     }
 }
