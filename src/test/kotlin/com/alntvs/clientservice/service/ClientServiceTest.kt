@@ -3,6 +3,7 @@ package com.alntvs.clientservice.service
 import com.alntvs.clientservice.entity.ClientEntity
 import com.alntvs.clientservice.exception.ClientServiceException
 import com.alntvs.clientservice.mapper.ClientMapper
+import com.alntvs.clientservice.mapper.ClientMapperImpl
 import com.alntvs.clientservice.model.ClientDTO
 import com.alntvs.clientservice.repository.ClientRepository
 import io.mockk.every
@@ -10,13 +11,14 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
 import javax.persistence.EntityNotFoundException
 
 internal class ClientServiceTest {
 
     private val clientRepository: ClientRepository = mockk<ClientRepository>()
-    private val mapper: ClientMapper = mockk<ClientMapper>()
+    private val mapper: ClientMapper = mockk<ClientMapperImpl>()
     private val clientService: ClientService = ClientService(clientRepository, mapper)
 
     @Test
@@ -111,7 +113,102 @@ internal class ClientServiceTest {
     }
 
     @Test
-    fun update() {
+    fun `update with correct clientDTO`() {
+        val id: Long = 1
+        val username = "user1"
+        val clientDTO = ClientDTO(id = id, userName = username)
+        val clientEntity = ClientEntity(id = id, userName = username)
+
+        every { mapper.clientDTOToEntity(clientDTO) } returns clientEntity
+        every { clientRepository.findByUserName(username) } returns null
+        every { clientRepository.findByIdOrNull(id) } returns clientEntity
+        every { clientRepository.save(clientEntity) } returns clientEntity
+
+        clientService.update(clientDTO)
+
+        verify {
+            clientRepository.save(clientEntity)
+        }
+    }
+
+    @Test
+    fun `update username on already exist client`() {
+        val idModifyClient: Long = 1
+        val idOtherUser: Long = 2
+        val username = "userName"
+        val oldUsername = "oldUsername"
+        val oldClientEntity = ClientEntity(id = idModifyClient, userName = oldUsername)
+        val otherClientEntity = ClientEntity(id = idOtherUser, userName = username)
+        val clientDTO = ClientDTO(id = idModifyClient, userName = username)
+        val msg = "Client with username:${clientDTO.userName} already exists!"
+
+
+        every { clientRepository.findByIdOrNull(idModifyClient) } returns oldClientEntity
+        every { clientRepository.findByUserName(username) } returns otherClientEntity
+
+        val result = assertThrows<IllegalArgumentException> {
+            clientService.update(clientDTO)
+        }
+
+        assert(result.message == msg)
+    }
+
+    @Test
+    fun `update not exist client`() {
+        val id: Long = 1
+        val username = "userName"
+        val clientEntity = ClientEntity(id = id, userName = username)
+        val clientDTO = ClientDTO(id = id, userName = username)
+        val msg = "Client with id:${clientDTO.id} doesn't exists!"
+
+
+        every { clientRepository.findByIdOrNull(id) } returns null
+        every { clientRepository.findByUserName(clientEntity.userName!!) } returns clientEntity
+        every { mapper.clientDTOToEntity(clientDTO) } answers { callOriginal() }
+        every { clientRepository.save(clientEntity) } returns clientEntity
+
+        val result = assertThrows<IllegalArgumentException> {
+            clientService.update(clientDTO)
+        }
+
+        assert(result.message == msg)
+    }
+
+    @Test
+    fun `update with null id`() {
+        val id: Long? = null
+        val username = "user1"
+        val clientDTO = ClientDTO(id = id, userName = username)
+        val clientEntity = ClientEntity(id = id, userName = username)
+        val msg = "must be filled!"
+
+        every { clientRepository.findByIdOrNull(id) } returns clientEntity
+        every { clientRepository.findByUserName(clientEntity.userName!!) } returns clientEntity
+        every { mapper.clientDTOToEntity(clientDTO) } answers { callOriginal() }
+        every { clientRepository.save(clientEntity) } returns clientEntity
+
+        val exception = assertThrows<IllegalArgumentException> {
+            clientService.update(clientDTO)
+        }
+
+        assert(exception.message?.contains(msg) ?: false)
+    }
+
+    @Test
+    fun `update with null username`() {
+        val id: Long = 1
+        val clientDTO = ClientDTO(id = id, userName = null)
+        val username = "user1"
+        val clientEntity = ClientEntity(id = id, userName = username)
+
+        every { clientRepository.findByIdOrNull(id) } returns clientEntity
+        every { clientRepository.findByUserName(clientEntity.userName!!) } returns clientEntity
+        every { mapper.clientDTOToEntity(clientDTO) } answers { callOriginal() }
+        every { clientRepository.save(clientEntity) } returns clientEntity
+
+        clientService.update(clientDTO)
+
+        verify { clientRepository.save(clientEntity) }
     }
 
     @Test
