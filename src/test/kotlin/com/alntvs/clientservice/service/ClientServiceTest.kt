@@ -7,6 +7,7 @@ import com.alntvs.clientservice.mapper.ClientMapperImpl
 import com.alntvs.clientservice.model.ClientDTO
 import com.alntvs.clientservice.repository.ClientRepository
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
@@ -212,6 +213,32 @@ internal class ClientServiceTest {
     }
 
     @Test
-    fun delete() {
+    fun `delete with correct argument`() {
+        val id: Long = 1
+        val clientEntity = ClientEntity(id = id)
+
+        every { clientRepository.findByIdOrNull(id) } returns clientEntity
+        justRun { clientRepository.deleteById(id) }
+
+        clientService.delete(id)
+
+        verify {
+            clientRepository.deleteById(id)
+        }
+    }
+
+    @Test
+    fun `delete not exist user`() {
+        val id: Long = 1
+        val msg = "Client with id:$id doesn't exists!"
+
+        every { clientRepository.findByIdOrNull(id) } returns null
+        justRun { clientRepository.deleteById(id) }
+
+        val exception = assertThrows<IllegalArgumentException> {
+            clientService.delete(id)
+        }
+
+        assert(exception.message == msg)
     }
 }
