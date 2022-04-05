@@ -62,6 +62,20 @@ internal class ClientServiceTest {
 
     @Test
     fun getAll() {
+        val client1 = ClientEntity(id = 1, userName = "user1")
+        val client2 = ClientEntity(id = 2, userName = "user2")
+        val clientDTO1 = ClientDTO(id = 1, userName = "user1")
+        val clientDTO2 = ClientDTO(id = 2, userName = "user2")
+        val clientEntityList = listOf(client1, client2)
+        val clientDTOList = listOf(clientDTO2, clientDTO1)
+
+        every { clientRepository.findAll() } returns listOf(client1, client2)
+        every { mapper.clientEntityToDTOasList(clientEntityList) } returns clientDTOList
+
+        val result = clientService.getAll()
+
+        verify { clientRepository.findAll() }
+        assert(result == clientDTOList)
     }
 
     @Test
