@@ -51,6 +51,6 @@ class ClientService(
     fun delete(id: Long) {
         clientRepository.findByIdOrNull(id)?.also {
             clientRepository.deleteById(id)
-        } ?: throw IllegalArgumentException("Client with id:$id doesn't exists!")
+            } ?: throw IllegalArgumentException("Client with id:$id doesn't exists!")
     }
 }
