@@ -9,35 +9,48 @@ internal class ClientMapperImplTest {
     private val mapper = ClientMapperImpl()
 
     @Test
-    fun clientEntityToDTO() {
-        val emptyClientEntity = ClientEntity()
-        val fullClientEntity =
-            ClientEntity(1, "username1", "firstname1", "lastname1", "e@mail.my", "+71231231212", "Moscow", true)
-        val expectedClientDTOFromEmptyClientEntity = ClientDTO()
-        val expectedClientDTOFromFullClientEntity =
-            ClientDTO(1, "username1", "firstname1", "lastname1", "e@mail.my", "+71231231212", "Moscow", true)
+    fun `clientEntityToDTO map empty`() {
+        val clientEntity = ClientEntity()
+        val expectedClientDTO = ClientDTO()
 
-        val resultFromEmptyClientEntity = mapper.clientEntityToDTO(emptyClientEntity)
-        val resultFromFullClientEntity = mapper.clientEntityToDTO(fullClientEntity)
+        val result = mapper.clientEntityToDTO(clientEntity)
 
-        assert(expectedClientDTOFromEmptyClientEntity == resultFromEmptyClientEntity)
-        assert(expectedClientDTOFromFullClientEntity == resultFromFullClientEntity)
+        assert(expectedClientDTO == result)
     }
 
     @Test
-    fun clientDTOToEntity() {
-        val emptyClientDTO = ClientDTO()
-        val fullClientDTO =
-            ClientDTO(1, "username1", "firstname1", "lastname1", "e@mail.my", "+71231231212", "Moscow", true)
-        val expectedClientEntityFromEmptyClientDTO = ClientEntity()
-        val expectedClientEntityFromFullClientDTO =
+    fun `clientEntityToDTO map full`() {
+        val clientEntity =
             ClientEntity(1, "username1", "firstname1", "lastname1", "e@mail.my", "+71231231212", "Moscow", true)
 
-        val resultFromEmptyClientDTO = mapper.clientDTOToEntity(emptyClientDTO)
-        val resultFromFullClientDTO = mapper.clientDTOToEntity(fullClientDTO)
+        val expectedClientDTO =
+            ClientDTO(1, "username1", "firstname1", "lastname1", "e@mail.my", "+71231231212", "Moscow", true)
 
-        assert(expectedClientEntityFromEmptyClientDTO == resultFromEmptyClientDTO)
-        assert(expectedClientEntityFromFullClientDTO == resultFromFullClientDTO)
+        val result = mapper.clientEntityToDTO(clientEntity)
+
+        assert(expectedClientDTO == result)
+    }
+
+    @Test
+    fun `clientDTOToEntity map empty`() {
+        val clientDTO = ClientDTO()
+        val expectedClientEntity = ClientEntity()
+
+        val result = mapper.clientDTOToEntity(clientDTO)
+
+        assert(expectedClientEntity == result)
+    }
+
+    @Test
+    fun `clientDTOToEntity map full`() {
+        val clientDTO =
+            ClientDTO(1, "username1", "firstname1", "lastname1", "e@mail.my", "+71231231212", "Moscow", true)
+        val expectedClientEntity =
+            ClientEntity(1, "username1", "firstname1", "lastname1", "e@mail.my", "+71231231212", "Moscow", true)
+
+        val result = mapper.clientDTOToEntity(clientDTO)
+
+        assert(expectedClientEntity == result)
     }
 
     @Test
