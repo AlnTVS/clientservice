@@ -2,6 +2,11 @@ package com.alntvs.clientservice.mapper
 
 import com.alntvs.clientservice.entity.ClientEntity
 import com.alntvs.clientservice.model.ClientDTO
+import io.kotest.matchers.collections.shouldContainAnyOf
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.collections.shouldMatchEach
+import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 internal class ClientMapperImplTest {
@@ -15,7 +20,7 @@ internal class ClientMapperImplTest {
 
         val result = mapper.clientEntityToDTO(clientEntity)
 
-        assert(expectedClientDTO == result)
+        result shouldBe expectedClientDTO
     }
 
     @Test
@@ -28,7 +33,7 @@ internal class ClientMapperImplTest {
 
         val result = mapper.clientEntityToDTO(clientEntity)
 
-        assert(expectedClientDTO == result)
+        result shouldBe expectedClientDTO
     }
 
     @Test
@@ -38,7 +43,7 @@ internal class ClientMapperImplTest {
 
         val result = mapper.clientDTOToEntity(clientDTO)
 
-        assert(expectedClientEntity == result)
+        result shouldBe expectedClientEntity
     }
 
     @Test
@@ -50,7 +55,7 @@ internal class ClientMapperImplTest {
 
         val result = mapper.clientDTOToEntity(clientDTO)
 
-        assert(expectedClientEntity == result)
+        result shouldBe expectedClientEntity
     }
 
     @Test
@@ -66,6 +71,6 @@ internal class ClientMapperImplTest {
 
         val resultListFromClientEntityList = mapper.clientEntityToDTOasList(clientEntityList)
 
-        assert(expectedClientDTOList == resultListFromClientEntityList)
+        resultListFromClientEntityList shouldContainExactlyInAnyOrder expectedClientDTOList
     }
 }
