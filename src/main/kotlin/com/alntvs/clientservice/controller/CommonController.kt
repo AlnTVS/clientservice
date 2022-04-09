@@ -26,7 +26,7 @@ class CommonController : ResponseBodyAdvice<Any> {
         response: ServerHttpResponse
     ): Any? {
         body?.also {
-            if (body.javaClass == ErrorDto::class.java) return body
+            if (body is ErrorDto) return body
         }
         val dataDto = DataDto()
         if (returnType.genericParameterType.typeName == "void") {
