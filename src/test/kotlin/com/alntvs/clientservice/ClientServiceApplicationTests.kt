@@ -5,13 +5,13 @@ import com.alntvs.clientservice.model.ClientDTO
 import com.alntvs.clientservice.model.DataDto
 import com.alntvs.clientservice.repository.ClientRepository
 import com.google.gson.GsonBuilder
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.assertions.assertSoftly
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
 import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -33,8 +33,10 @@ class ClientServiceApplicationTests(
 
         val response = restTemplate.postForEntity("/user/create", clientDTO, String::class.java)
 
-        assertThat(response.statusCodeValue).isEqualTo(200)
-        assertThat(response.body).isEqualTo(jsonDataDto)
+        assertSoftly {
+            response.statusCodeValue shouldBe 200
+            response.body shouldBe jsonDataDto
+        }
     }
 
     @Test
@@ -48,8 +50,10 @@ class ClientServiceApplicationTests(
 
         val response = restTemplate.postForEntity("/user/create", clientDTO, String::class.java)
 
-        assertThat(response.statusCodeValue).isEqualTo(200)
-        assertThat(response.body).contains(errorMsg)
+        assertSoftly {
+            response.statusCodeValue shouldBe 200
+            response.body shouldContain errorMsg
+        }
     }
 
     @Test
@@ -59,8 +63,10 @@ class ClientServiceApplicationTests(
 
         val response = restTemplate.postForEntity("/user/create", clientDTO, String::class.java)
 
-        assertThat(response.statusCodeValue).isEqualTo(200)
-        assertThat(response.body).contains(errorMsg)
+        assertSoftly {
+            response.statusCodeValue shouldBe 200
+            response.body shouldContain errorMsg
+        }
     }
 
     @Test
@@ -73,20 +79,24 @@ class ClientServiceApplicationTests(
 
         val response = restTemplate.postForEntity("/user/update", clientDTO, String::class.java)
 
-        assertThat(response.statusCodeValue).isEqualTo(200)
-        assertThat(response.body).isEqualTo(expectedBody)
+        assertSoftly {
+            response.statusCodeValue shouldBe 200
+            response.body shouldBe expectedBody
+        }
     }
 
     @Test
     fun `update REST by incorrect request, null id`() {
         val clientDTO =
                 ClientDTO(null, "username1", "Name", "Surname", "e@mail.com", "+007", "Russia, Saint-Petersburg", true)
-        val expectedMsg = "Field 'id' and 'userName' must be filled!"
+        val errorMsg = "Field 'id' and 'userName' must be filled!"
 
         val response = restTemplate.postForEntity("/user/update", clientDTO, String::class.java)
 
-        assertThat(response.statusCodeValue).isEqualTo(200)
-        assertThat(response.body).contains(expectedMsg)
+        assertSoftly {
+            response.statusCodeValue shouldBe 200
+            response.body shouldContain errorMsg
+        }
     }
 
     @Test
@@ -99,8 +109,10 @@ class ClientServiceApplicationTests(
 
         val response = restTemplate.postForEntity("/user/update", clientDTO, String::class.java)
 
-        assertThat(response.statusCodeValue).isEqualTo(200)
-        assertThat(response.body).isEqualTo(expectedBody)
+        assertSoftly {
+            response.statusCodeValue shouldBe 200
+            response.body shouldBe expectedBody
+        }
     }
 
     @Test
@@ -110,14 +122,16 @@ class ClientServiceApplicationTests(
         val clientEntity2 = ClientEntity(userName = "other username")
         val clientDTO =
                 ClientDTO(2, username)
-        val expectedMsg = "Client with username:$username already exists!"
+        val errorMsg = "Client with username:$username already exists!"
         clientRepository.save(clientEntity1)
         clientRepository.save(clientEntity2)
 
         val response = restTemplate.postForEntity("/user/update", clientDTO, String::class.java)
 
-        assertThat(response.statusCodeValue).isEqualTo(200)
-        assertThat(response.body).contains(expectedMsg)
+        assertSoftly {
+            response.statusCodeValue shouldBe 200
+            response.body shouldContain errorMsg
+        }
     }
 
     @Test
@@ -125,12 +139,13 @@ class ClientServiceApplicationTests(
         val id: Long = 1
         val clientDTO =
                 ClientDTO(id)
-        val expectedMsg = "Client with id:$id doesn't exists!"
+        val errorMsg = "Client with id:$id doesn't exists!"
 
         val response = restTemplate.postForEntity("/user/update", clientDTO, String::class.java)
 
-        assertThat(response.statusCodeValue).isEqualTo(200)
-        assertThat(response.body).contains(expectedMsg)
+        assertSoftly {
+            response.statusCodeValue shouldBe 200
+            response.body shouldContain errorMsg
+        }
     }
-
 }
